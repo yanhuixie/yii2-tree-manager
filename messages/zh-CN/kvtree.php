@@ -78,4 +78,7 @@ return [
     'This operation is not allowed.' => '无权操作。',
     'Untitled' => '无标题',
     'Visible' => '可见',
+
+    'The record that you want to delete or modify is referenced by another entity, you may not able to delete or modify it or you can remove the relationship first.' => '您希望删除或修改的记录已经被其他实体所引用，所以您不能删除或修改它，或者您可以先解除其他实体的引用。',
+    'The above error occurred while the Web server was processing your request.' => '服务器在处理您的请求时检测到了上述问题。',
 ];

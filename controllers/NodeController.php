@@ -58,37 +58,48 @@ class NodeController extends Controller
      * - `out`: _string_, the output content
      * - `status`: _string_, success or error
      */
-    public static function process($callback, $msgError, $msgSuccess)
-    {
-        $error = $msgError;
-        try {
-            $success = call_user_func($callback);
-        } catch (DbException $e) {
-            $success = false;
-            $error = $e->getMessage();
-        } catch (NotSupportedException $e) {
-            $success = false;
-            $error = $e->getMessage();
-        } catch (InvalidParamException $e) {
-            $success = false;
-            $error = $e->getMessage();
-        } catch (InvalidConfigException $e) {
-            $success = false;
-            $error = $e->getMessage();
-        } catch (InvalidCallException $e) {
-            $success = false;
-            $error = $e->getMessage();
-        } catch (Exception $e) {
-            $success = false;
-            $error = $e->getMessage();
-        }
-        if ($success !== false) {
-            $out = $msgSuccess === null ? $success : $msgSuccess;
-            return ['out' => $out, 'status' => 'success'];
-        } else {
-            return ['out' => $error, 'status' => 'error'];
-        }
-    }
+     public static function process($callback, $msgError, $msgSuccess)
+     {
+         $error = $msgError;
+         $errorF = Yii::t('kvtree', 'The above error occurred while the Web server was processing your request.');
+         try {
+             $success = call_user_func($callback);
+         } catch (DbException $e) {
+             $success = false;
+             $error = $e->getMessage();
+             $errorF = $e->getCode() == 23000 ? 
+                 Yii::t('kvtree', 'The record that you want to delete or modify is referenced by another entity, you may not able to delete or modify it or you can remove the relationship first.') :
+                 'DATABASE EXCEPTION. '.$errorF;
+         } catch (NotSupportedException $e) {
+             $success = false;
+             $error = $e->getMessage();
+             $errorF = 'NOT SUPPORTED. '.$errorF;
+         } catch (InvalidParamException $e) {
+             $success = false;
+             $error = $e->getMessage();
+             $errorF = 'INVALID PARAMETERS. '.$errorF;
+         } catch (InvalidConfigException $e) {
+             $success = false;
+             $error = $e->getMessage();
+             $errorF = 'INVALID CONFIGURATION. '.$errorF;
+         } catch (InvalidCallException $e) {
+             $success = false;
+             $error = $e->getMessage();
+             $errorF = 'INVALID CALL. '.$errorF;
+         } catch (Exception $e) {
+             $success = false;
+             $error = $e->getMessage();
+             $errorF = 'UNKNOW EXCEPTION. '.$errorF;
+         }
+         
+         if ($success !== false) {
+             $out = $msgSuccess === null ? $success : $msgSuccess;
+             return ['out' => $out, 'status' => 'success'];
+         } else {
+             Yii::error($error);
+             return ['out' => $errorF, 'status' => 'error'];
+         }
+     }
 
     /**
      * Gets the data from $_POST after parsing boolean values
